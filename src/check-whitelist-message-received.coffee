@@ -10,6 +10,7 @@ class CheckWhitelistMessageReceived
     fromUuid ?= auth.uuid
     emitter = fromUuid
     subscriber = toUuid
+    return @sendResponse responseId, 403, callback unless fromUuid == auth.uuid
     @whitelistManager.checkMessageReceived {emitter, subscriber}, (error, verified) =>
       return @sendResponse responseId, 500, callback if error?
       return @sendResponse responseId, 403, callback unless verified

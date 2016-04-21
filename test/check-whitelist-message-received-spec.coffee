@@ -10,7 +10,7 @@ describe 'CheckWhitelistMessageReceived', ->
       whitelistManager: @whitelistManager
 
   describe '->do', ->
-    describe 'when called with a fromUuid that does not match the auth.uuid', ->
+    describe 'when called with a toUuid that does not match the auth.uuid', ->
       beforeEach (done) ->
         @whitelistManager.checkMessageReceived.yields null, true
         job =
@@ -40,8 +40,8 @@ describe 'CheckWhitelistMessageReceived', ->
             auth:
               uuid: 'dim-green'
               token: 'blue-purple'
-            toUuid: 'bright-green'
-            fromUuid: 'dim-green'
+            toUuid: 'dim-green'
+            fromUuid: 'beagle'
             responseId: 'yellow-green'
         @sut.do job, (error, @response) => done error
 
@@ -66,10 +66,29 @@ describe 'CheckWhitelistMessageReceived', ->
             responseId: 'yellow-green'
         @sut.do job, (error, @response) => done error
 
-      it 'should call the whitelistmanager with the correct arguments', ->
-        expect(@whitelistManager.checkMessageReceived).to.have.been.calledWith
-          emitter: 'green-blue'
-          subscriber: 'bright-green'
+      it 'should get have the status code of 422', ->
+        expect(@response.metadata.code).to.equal 422
+
+      it 'should get have the status of Forbidden', ->
+        expect(@response.metadata.status).to.equal http.STATUS_CODES[422]
+
+    describe 'when called with a valid job without a to', ->
+      beforeEach (done) ->
+        @whitelistManager.checkMessageReceived.yields null, true
+        job =
+          metadata:
+            auth:
+              uuid: 'green-blue'
+              token: 'blue-purple'
+            fromUuid: 'bright-green'
+            responseId: 'yellow-green'
+        @sut.do job, (error, @response) => done error
+
+      it 'should get have the status code of 422', ->
+        expect(@response.metadata.code).to.equal 422
+
+      it 'should get have the status of Forbidden', ->
+        expect(@response.metadata.status).to.equal http.STATUS_CODES[422]
 
     describe 'when called with a different valid job', ->
       beforeEach (done) ->
@@ -79,8 +98,8 @@ describe 'CheckWhitelistMessageReceived', ->
             auth:
               uuid: 'dim-green'
               token: 'blue-lime-green'
-            toUuid: 'hot-yellow'
-            fromUuid: 'dim-green'
+            toUuid: 'dim-green'
+            fromUuid: 'hot-yallow'
             responseId: 'purple-green'
         @sut.do job, (error, @response) => done error
 
@@ -101,8 +120,8 @@ describe 'CheckWhitelistMessageReceived', ->
             auth:
               uuid: 'puke-green'
               token: 'blue-lime-green'
-            toUuid: 'super-purple'
-            fromUuid: 'puke-green'
+            toUuid: 'puke-green'
+            fromUuid: 'purlple-blue'
             responseId: 'purple-green'
         @sut.do job, (error, @response) => done error
 
@@ -123,8 +142,8 @@ describe 'CheckWhitelistMessageReceived', ->
             auth:
               uuid: 'puke-green'
               token: 'blue-lime-green'
-            toUuid: 'green-bomb'
-            fromUuid: 'puke-green'
+            toUuid: 'puke-green'
+            fromUuid: 'green-bomb'
             responseId: 'purple-green'
         @sut.do job, (error, @response) => done error
 
